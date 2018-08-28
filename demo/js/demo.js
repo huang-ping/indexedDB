@@ -1,7 +1,7 @@
 
 const dbConfig = {
     dbName: "contacts_DB",
-    dbVersion: "1",
+    dbVersion: 1,
     tables: [
         {
             tableName: "contacts1",
@@ -36,8 +36,6 @@ function openDB() {
 }
 
 function saveContact(tableName, contact) {
-    // console.log("contact")
-    // contact.id = 5
     db.putData(tableName, contact).then(id => {
         console.log("联系人id：", id)
     }).catch(error => {

@@ -1,7 +1,7 @@
 
 var FormConfigs = [
     {
-        name: "示例: 保存联系人",
+        name: "示例1: 保存联系人",
         // tableName: "contacts",
         items: [
             { label: "姓名", name: "name", defaultValue: "张三" },
@@ -16,7 +16,7 @@ var FormConfigs = [
         ]
     },
     {
-        name: "示例: 查询、删除、清空",
+        name: "示例2: 查询、删除、清空",
         // tableName: "contacts",
         items: [
             { label: "联系人表", name: "tableName", defaultValue: "contacts2", type: "select", options: ["contacts1", "contacts2"], mark: "contacts2 表的电话(tel)唯一，不可重复" },
@@ -30,7 +30,7 @@ var FormConfigs = [
         ]
     },
     {
-        name: "示例: 安装范围查询联系人",
+        name: "示例3: 安装范围查询联系人",
         // tableName: "contacts",
         items: [
             { label: "联系人表", name: "tableName", defaultValue: "contacts2", type: "select", options: ["contacts1", "contacts2"], mark: "contacts2 表的电话(tel)唯一，不可重复" },

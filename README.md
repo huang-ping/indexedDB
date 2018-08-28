@@ -5,17 +5,65 @@ indexedDB 封装便于直接使用
 
 #### 软件架构
 软件架构说明
-
+[说明文字](#test)
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+> 如果在最新的浏览器使用，直接引用  src/DBFactory.js，否则需要babel编译，推荐webpack
 
 #### 使用说明
+* 初始化数据库
 
-1. xxxx
+> 1. 初始化数据库
+```
+/**
+ * dbName  indexedDB name
+ * dbVersion    版本号
+ * tables 表
+ * -- tableName  表名
+ * -- keyPath    主键
+ * -- -- keyPathName   主键名
+ * -- -- autoIncrement 是否自动递增
+ * -- indexs   索引
+ * -- -- indexName 索引名
+ * -- -- unique    索引值是否唯一
+ * -- -- indexName 一般不填，
+ */
+const dbConfig = {
+    dbName: "contacts_DB",       // DB name
+    dbVersion: 1,              // 版本,
+    tables: [
+        {
+            tableName: "contacts1",
+            keyPath: { keyPathName: 'id', autoIncrement: true },
+            indexs: [
+                { indexName: 'name', unique: false },
+                { indexName: 'tel', unique: false },
+                { indexName: 'age', unique: false },
+                { indexName: 'addr', unique: false }
+            ]
+        },
+        {
+            tableName: "contacts2",
+            keyPath: { keyPathName: 'id', autoIncrement: true },
+            indexs: [
+                { indexName: 'name', unique: false },
+                { indexName: 'tel', unique: true },
+                { indexName: 'age', unique: false }
+            ]
+        }
+    ]
+}
+
+db = new DBFactory(dbConfig)
+// 
+db.open().then(data => {
+    console.log("open db success")
+}).catch(error => {
+    console.log(error)
+})
+```
+<span id="test">test</span>
 2. xxxx
 3. xxxx
 

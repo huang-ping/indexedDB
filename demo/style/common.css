@@ -119,3 +119,7 @@ option {
 body {
     margin-top: 30px;
 }
+
+.tab_head_item:hover {
+    color: #409EFF;
+}
