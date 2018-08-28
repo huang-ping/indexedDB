@@ -44,7 +44,7 @@ class DBFactory {
         })
     }
     /**
-     * 添加数据 主键重复会更新
+     * 更新 主键重复会更新
      * @param {*} tableName 
      * @param {*} data 
      */

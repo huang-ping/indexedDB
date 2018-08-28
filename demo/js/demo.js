@@ -40,9 +40,6 @@ function saveContact(tableName, contact) {
         console.log("联系人id：", id)
     }).catch(error => {
         console.error(error)
-        console.log(error.code)
-        console.log(error.message)
-        console.log(error.name)
     })
 }
 function update(tableName, contact) {
