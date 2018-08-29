@@ -1,7 +1,7 @@
 # indexedDB
 
 #### 项目介绍
-indexedDB 封装便于直接使用
+indexedDB 封装便于直接使用，indexedDB未加浏览器前缀兼容老版本浏览器
 
 #### 软件架构
 软件架构说明
@@ -17,7 +17,7 @@ indexedDB 封装便于直接使用
 > ```db.open()```  
 >> dbConfig示例：
 > * dbName       indexedDB name
-> * dbVersion    版本号
+> * dbVersion    版本号 int类型 增加table 或者增加删除索引时需要升级版本号
 > * tables 表
 > * -- tableName  表名
 > * -- keyPath    主键
@@ -30,7 +30,7 @@ indexedDB 封装便于直接使用
 > ```
 > const dbConfig = {
 >   dbName: "contacts_DB",       // DB name
->   dbVersion: 1,              // 版本,
+>   dbVersion: 1,   // 版本, int类型 增加table 或者增加删除索引时需要升级版本号
 >   tables: [
 >      {
 >           tableName: "contacts2",
