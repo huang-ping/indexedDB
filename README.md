@@ -60,76 +60,84 @@ indexedDB 封装便于直接使用
 > }).catch(error => {
 >   console.log(error)
 > })
-```
-> #### 2、保存数据 db.addData  db.addData
-```
-// 新增
-let data = {
-    name: "张三",
-    tel: "17682330989",
-    age: "29",
-    addr: "浙江-杭州-xxx小区",
-}
-// 更新
-db.addData("contacts1",data).then(id => {
-    data.id = id
-    console.log("联系人id：", id)
-})
-db.putData("contacts1",data).then(id => {})
-```
-> #### 3、根据主键查找数据 db.getDataByKey
-```
-db.getDataByKey("contacts1", 1).then(data=>{})
-```
-> #### 4、根据主键删除数据 db.deleteDataByKey
-```
-db.deleteDataByKey("contacts1", 1).then(data=>{})
-```
-> #### 5、获取数据 db.getTableData(tableName, option)
-```
-  /**
-    * @param {*} tableName 
-    * @param {*} option 
-    * option = {
-    *  start:      
-    *  lowerOpen:  // 查询范围 是否 不包含 start 默认 false
-    *  end: 
-    *  upperOpen:  // 查询范围 是否 不包含 end   默认 true
-    *  index:      // 索引名 若为空，则为主键
-    *  indexValue: // 索引值 start end存在时不生效 
-    * }
-    */
-```
-> 示例
-```
-// 获取 表contacts1 的所有数据
-db.getTableData("contacts1").then(data=>{})
-// 获取 id 大于20的所有数据
-db.getTableData("contacts1", {
-    start: 20
-//    lowerOpen: false, 是否不包含
-}).then(data=>{})
-// 获取 索引age 大于20的所有数据
-db.getTableData("contacts1", {
-    start: "20",
-    index: "age"
-}).then(data=>{})
-// 获取 索引age 大于20小于30(不包括30)的所有数据
-db.getTableData("contacts1", {
-    start: "20",
-    end: "30",
-    index: "age"
-}).then(data=>{})
-// 获取 索引age 等于 20 的所有数据
-db.getTableData("contacts1", {
-    index: ""age,
-    indexValue: "20"
-}).then(data=>{})
-db.getTableData("contacts1", {
-    end: "20",
-    index: "age"
-}).then(data=>{})
-```
+>```
+  
+> #### 2、添加/更新数据
+> ```db.addData(tableName, data)```   
+> ```db.putData(tableName, data)```
+>```
+> let data = {
+>     name: "张三",
+>     tel: "17682330989",
+>     age: "29",
+>     addr: "浙江-杭州-xxx小区",
+> }
+> // 数据重复时会报错
+> db.addData("contacts1",data).then(id => {
+>     data.id = id
+>     console.log("联系人id：", id)
+> })
+> data.age = 30
+> // 数据重复时会更新
+> db.putData("contacts1",data).then(id => {})
+> ```
+  
+> #### 3、根据主键查找数据  
+> ```getDataByKey(tableName, keyPathValue)```
+> ```
+> // 获取id为1的联系人
+> db.getDataByKey("contacts1", 1).then(data=>{})
+> ```
+  
+> > #### 4、根据主键删除数据 db.deleteDataByKey
+> ```
+> db.deleteDataByKey("contacts1", 1).then(data=>{})
+> ```
+> > #### 5、获取数据 db.getTableData(tableName, option)
+> ```
+>   /**
+>     * @param {*} tableName 
+>     * @param {*} option 
+>     * option = {
+>     *  start:      
+>     *  lowerOpen:  // 查询范围 是否 不包含 start 默认 false
+>     *  end: 
+>     *  upperOpen:  // 查询范围 是否 不包含 end   默认 true
+>     *  index:      // 索引名 若为空，则为主键
+>     *  indexValue: // 索引值 start end存在时不生效 
+>     * }
+>     */
+> ```
+> > 示例
+> ```
+> // 获取 表contacts1 的所有数据
+> db.getTableData("contacts1").then(data=>{})
+> // 获取 id 大于20的所有数据
+> db.getTableData("contacts1", {
+>     start: 20
+> //    lowerOpen: false, 是否不包含
+> }).then(data=>{})
+> // 获取 索引age 大于20的所有数据
+> db.getTableData("contacts1", {
+>     start: "20",
+>     index: "age"
+> }).then(data=>{})
+> // 获取 索引age 大于20小于30(不包括30)的所有数据
+> db.getTableData("contacts1", {
+>     start: "20",
+>     end: "30",
+>     index: "age"
+> }).then(data=>{})
+> // 获取 索引age 等于 20 的所有数据
+> db.getTableData("contacts1", {
+>     index: ""age,
+>     indexValue: "20"
+> }).then(data=>{})
+> db.getTableData("contacts1", {
+>     end: "20",
+>     index: "age"
+> }).then(data=>{})
+> ```
 > #### 6、获取表格数据条数 db.getTableCount
 ```
 db.getTableCount("contacts1").then(count=>{})
@@ -141,9 +149,10 @@ db.getTableCount("contacts1").then(count=>{})
 > * @param {* 索引名} index 
 > * @param {* 索引值} indexValue 
 > * @desc 获取到的是最早储存的一条数据
-```
-db.getDataByIndexOnly("contacts1", "tel", "17636559897").then(count=>{})
-```
+> 示例
+> ```
+> db.getDataByIndexOnly("contacts1", "tel", "17636559897").then(count=>{})
+> ```
 
 
 #### 参与贡献
