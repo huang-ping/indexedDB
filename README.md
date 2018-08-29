@@ -15,8 +15,8 @@ indexedDB 封装便于直接使用
 > #### 1、初始化数据库
 > ```db = new DBFactory(dbConfig)```  
 > ```db.open()```  
-> dbConfig示例：
-> * dbName  indexedDB name
+>> dbConfig示例：
+> * dbName       indexedDB name
 > * dbVersion    版本号
 > * tables 表
 > * -- tableName  表名
@@ -33,7 +33,7 @@ indexedDB 封装便于直接使用
 >   dbVersion: 1,              // 版本,
 >   tables: [
 >      {
->           tableName: "contacts1",
+>           tableName: "contacts2",
 >           keyPath: { keyPathName: 'id', autoIncrement: true },
 >           indexs: [
 >               { indexName: 'name', unique: false },
@@ -65,6 +65,7 @@ indexedDB 封装便于直接使用
 > #### 2、添加/更新数据
 > ```db.addData(tableName, data)```   
 > ```db.putData(tableName, data)```
+>> 示例
 >```
 > let data = {
 >     name: "张三",
@@ -73,86 +74,129 @@ indexedDB 封装便于直接使用
 >     addr: "浙江-杭州-xxx小区",
 > }
 > // 数据重复时会报错
-> db.addData("contacts1",data).then(id => {
+> db.addData("contacts2",data).then(id => {
 >     data.id = id
 >     console.log("联系人id：", id)
 > })
 > data.age = 30
 > // 数据重复时会更新
-> db.putData("contacts1",data).then(id => {})
+> db.putData("contacts2",data).then(id => {})
 > ```
   
 > #### 3、根据主键查找数据  
 > ```getDataByKey(tableName, keyPathValue)```
+>> 示例
 > ```
 > // 获取id为1的联系人
-> db.getDataByKey("contacts1", 1).then(data=>{})
+> db.getDataByKey("contacts2", 1).then(data=>{
+>   console.log(data)    
+> })
 > ```
   
-> > #### 4、根据主键删除数据 db.deleteDataByKey
+> #### 4、根据主键删除数据  
+> ```deleteDataByKey(tableName, keyPathValue)``` 
+>> 示例 
 > ```
-> db.deleteDataByKey("contacts1", 1).then(data=>{})
+> db.deleteDataByKey("contacts2", 1).then(data=>{
+>   console.log(data)   
+> })
 > ```
-> > #### 5、获取数据 db.getTableData(tableName, option)
+  
+> #### 5、获取数据
 > ```
->   /**
->     * @param {*} tableName 
->     * @param {*} option 
->     * option = {
->     *  start:      
->     *  lowerOpen:  // 查询范围 是否 不包含 start 默认 false
->     *  end: 
->     *  upperOpen:  // 查询范围 是否 不包含 end   默认 true
->     *  index:      // 索引名 若为空，则为主键
->     *  indexValue: // 索引值 start end存在时不生效 
->     * }
->     */
+> /**
+>   * @param {*} tableName 
+>   * @param {*} option 
+>   * option = {
+>   *  start:      
+>   *  lowerOpen:  // 查询范围 是否 不包含 start 默认 false
+>   *  end: 
+>   *  upperOpen:  // 查询范围 是否 不包含 end   默认 true
+>   *  index:      // 索引名 若为空，则为主键
+>   *  indexValue: // 索引值 start end存在时不生效 
+>   * }
+>   */ 
 > ```
-> > 示例
+> ``` db.getTableData(tableName, option)```
+>> 示例
+> 
+> // 获取 表contacts2 的所有数据  
 > ```
-> // 获取 表contacts1 的所有数据
-> db.getTableData("contacts1").then(data=>{})
+> db.getTableData("contacts2").then(data=>{
+>   console.log(data)
+> })
+>```   
+>
 > // 获取 id 大于20的所有数据
-> db.getTableData("contacts1", {
->     start: 20
-> //    lowerOpen: false, 是否不包含
-> }).then(data=>{})
-> // 获取 索引age 大于20的所有数据
-> db.getTableData("contacts1", {
->     start: "20",
->     index: "age"
-> }).then(data=>{})
-> // 获取 索引age 大于20小于30(不包括30)的所有数据
-> db.getTableData("contacts1", {
->     start: "20",
->     end: "30",
->     index: "age"
-> }).then(data=>{})
-> // 获取 索引age 等于 20 的所有数据
-> db.getTableData("contacts1", {
->     index: ""age,
->     indexValue: "20"
-> }).then(data=>{})
-> db.getTableData("contacts1", {
->     end: "20",
->     index: "age"
-> }).then(data=>{})
 > ```
-> #### 6、获取表格数据条数 db.getTableCount
-```
-db.getTableCount("contacts1").then(count=>{})
-```
-> #### 6、根据索引获取数据  
+> db.getTableData("contacts2", {
+>   start: 20
+> }).then(datas=>{
+>   console.log(datas)
+> })
+> ```
+> 
+> // 获取 索引age 大于等于20的所有数据  
+> ```
+> db.getTableData("contacts2", {
+>   start: "20",
+>   index: "age"
+> }).then(datas=>{
+>   console.log(datas)    
+> })
+> ```
+> // 获取 索引age 大于20小于30(不包括30)的所有数据  
+> ```
+> db.getTableData("contacts2", {
+>   start: "20",
+>   end: "30",
+>   index: "age"
+> }).then(datas=>{
+>   console.log(datas)
+> })
+> ```
+> // 获取年龄小于 20 的所以数据
+> ```
+> db.getTableData("contacts2", {
+>   end: "20",
+>   index: "age"
+> }).then(data=>{
+>   console.log(datas)    
+> }) 
+> ```
+> // 获取 索引age 等于 20 的所有数据   
+> ```
+> db.getTableData("contacts2", {
+>   index: "age",
+>   indexValue: "20"
+> }).then(datas=>{
+>   console.log(datas)    
+> })
+> ```
+
+> #### 6、获取表数据总数
+> ```db.getTableCount(tableName)```
+>> 示例
+> ```
+> db.getTableCount("contacts2").then(count=>{
+>   console.log(count)
+> })
+> ```
+
+> #### 7、根据索引获取数据  
 > ```getDataByIndexOnly(tableName, index, indexValue) ```
-> * 根据 索引获取数据
-> * @param {*} tableName 
-> * @param {* 索引名} index 
-> * @param {* 索引值} indexValue 
-> * @desc 获取到的是最早储存的一条数据
-> 示例
+>> 示例
 > ```
-> db.getDataByIndexOnly("contacts1", "tel", "17636559897").then(count=>{})
+> db.getDataByIndexOnly("contacts2", "tel", "17636559897").then(count=>{
+>   console.log(data)
+>})
 > ```
+
+> #### 8、根据id删除 规划中 
+
+> #### 9、根据索引删除 规划中
+
+> #### 10、批量更新或增加 规划中
 
 
 #### 参与贡献
