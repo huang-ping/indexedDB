@@ -33,6 +33,18 @@ class DBFactory {
         this.isOpen = false
         this.db.close()
     }
+    deleteDatabase(dbName) {
+        let sss = indexedDB.deleteDatabase(dbName)
+        sss.onsuccess = function (e) {
+            console.log("deleteDatabase success", e)
+        }
+        sss.onerror = function (e) {
+            console.log("deleteDatabase onerror", e)
+        }
+        sss.onabort = function (e) {
+            console.log("deleteDatabase onabort", e)
+        }
+    }
     /**
      * 添加数据 主键重复会报错
      * @param {*} tableName 

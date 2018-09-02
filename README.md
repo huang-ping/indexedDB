@@ -63,8 +63,10 @@ indexedDB 封装便于直接使用，indexedDB未加浏览器前缀兼容老版�
 >```
   
 > #### 2、添加/更新数据
-> ```db.addData(tableName, data)```   
-> ```db.putData(tableName, data)```
+> ```
+> db.addData(tableName, data)
+> db.putData(tableName, data)
+> ```
 >> 示例
 >```
 > let data = {
