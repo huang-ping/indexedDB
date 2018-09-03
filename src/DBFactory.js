@@ -34,16 +34,22 @@ class DBFactory {
         this.db.close()
     }
     deleteDatabase(dbName) {
-        let sss = indexedDB.deleteDatabase(dbName)
-        sss.onsuccess = function (e) {
-            console.log("deleteDatabase success", e)
-        }
-        sss.onerror = function (e) {
-            console.log("deleteDatabase onerror", e)
-        }
-        sss.onabort = function (e) {
-            console.log("deleteDatabase onabort", e)
-        }
+        return new Promise((resolve, reject) => {
+            let request = indexedDB.deleteDatabase(dbName)
+            request.onsuccess = function (e) {
+                resolve()
+                // console.log("deleteDatabase success", e)
+            }
+            request.onerror = request.onabort = function (e) {
+                let error = e.target.error
+                reject({
+                    name: error.name,
+                    code: error.code,
+                    errMsg: error.message
+                })
+                // console.log("deleteDatabase onabort", e)
+            }
+        })
     }
     /**
      * 添加数据 主键重复会报错
@@ -99,19 +105,17 @@ class DBFactory {
      * }
      */
     getTableData(tableName, option) {
-        let keyRange = option ? this._getIDBKeyRange(option) : null
-        console.log(keyRange, "keyRange")
-        option = option || {}
         return this._requestDBCursor(tableName, function (store) {
-            // debugger
-            // return store.keyPath
+            let keyRange = option ? this._getIDBKeyRange(option) : null
+            // console.log(keyRange, "keyRange")
+            option = option || {}
             if (option.index && store.keyPath !== option.index) {
                 let indexStore = store.index(option.index)
                 return indexStore.openCursor(keyRange, option.reverse ? (IDBCursor.PREV || "prev") : undefined)
             }
-            if (keyRange === null && store.getAll) {
-                return store.getAll()
-            }
+            // if (keyRange === null && store.getAll) {
+            //     return store.getAll()
+            // }
             return store.openCursor(keyRange, option.reverse ? (IDBCursor.PREV || "prev") : undefined)
         })
     }
@@ -218,7 +222,7 @@ class DBFactory {
             }
             let data = []
             const store = this._getObjectStore(tableName, mode || 'readonly')
-            const curRequest = next(store)
+            const curRequest = next.call(this, store)
             curRequest.onsuccess = (e) => {
                 let cursor = e.target.result
                 // console.log(cursor)
@@ -286,7 +290,7 @@ class DBFactory {
                         })
                     }
                     indexNames.splice(post, 1)
-                    console.log(index)
+                    // console.log(index)
                 }
                 indexNames.forEach(item => {
                     store.deleteIndex(item)

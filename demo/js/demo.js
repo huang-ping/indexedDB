@@ -29,7 +29,7 @@ var db = {}
 function openDB() {
     db = new DBFactory(dbConfig)
     db.open().then(data => {
-        console.log("open db success")
+        // console.log("open db success")
     }).catch(error => {
         console.log(error)
     })

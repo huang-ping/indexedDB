@@ -123,3 +123,8 @@ body {
 .tab_head_item:hover {
     color: #409EFF;
 }
+
+#mocha .suite .test.pass.fast .duration {
+    color: #333;
+    display: inline;
+}
