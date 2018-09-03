@@ -75,7 +75,6 @@ describe('DBFactory 测试用例', function () {
             return test_db.getDataByKey("tab1", id)
         }).then(data => {
             chai.assert.typeOf(data, 'undefined');
-
         })
     });
 });
