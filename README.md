@@ -11,21 +11,6 @@ indexedDB 封装便于直接使用，indexedDB未加浏览器前缀兼容老版�
 
 > 如果在最新的浏览器使用，直接引用  src/DBFactory.js，否则需要babel编译，推荐webpack
 
-### 兼容性
-
-    | Tables   |      Are      |  Cool |
-    |----------|:-------------:|------:|
-    | col 1 is |  left-aligned | $1600 |
-    | col 2 is |    centered   |   $12 |
-    | col 3 is | right-aligned |    $1 |
-
-
-    | browser | window | mac | ubuntu | debian |
-    | - | :-: | :-: | -: | 
-    | Harry Potter | Gryffindor| 90 | true |
-
-    chrome 
-
 ### 使用说明
 > #### 1、初始化数据库
 > ```db = new DBFactory(dbConfig)```  
