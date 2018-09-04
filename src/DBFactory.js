@@ -15,6 +15,9 @@ class DBFactory {
             request.onsuccess = (e) => {
                 this.isOpen = true
                 this.db = e.target.result
+                this.db.onclose = () => {
+                    console.log("fsdfsd")
+                }
                 resolve()
                 this.log('成功打开数据库')
             }
@@ -58,7 +61,7 @@ class DBFactory {
      */
     addData(tableName, data) {
         return this._requestDBResult(tableName, "readwrite", function (store) {
-            return store.put(data)
+            return store.add(data)
         })
     }
     /**
@@ -68,7 +71,52 @@ class DBFactory {
      */
     putData(tableName, data) {
         return this._requestDBResult(tableName, "readwrite", function (store) {
+            // debugger keyPath
             return store.put(data)
+        })
+    }
+    /**
+     * 更新 主键重复会更新
+     * @param {*} tableName 
+     * @param {*} data 
+     */
+    putDatas(tableName, datas, isAdd) {
+        return new Promise((resolve, reject) => {
+            let store = this._getObjectStore(tableName, "readwrite")
+            let i = 0
+            let all = []
+            let errors = []
+            let len = datas.length
+            let errorCount = 0
+            datas.forEach(data => {
+                let temp = i
+                i++
+                let req = isAdd ? store.add(data) : store.put(data)
+                req.onsuccess = function (e) {
+                    all[temp] = e.target.result
+                    if ((all.length + errorCount) === len) {
+                        resolve({
+                            data: all,
+                            success: all.length,
+                            errors: errors,
+                            errorCount: errorCount
+                        })
+                    }
+                }
+                req.onerror = function () {
+                    errorCount++
+                    errors.push(e.target.error)
+                    if ((all.length + errorCount) === len) {
+                        resolve({
+                            data: all,
+                            success: all.length,
+                            errors: errors,
+                            errorCount: errorCount
+                        })
+                    }
+                }
+            })
+
         })
     }
     /**
@@ -113,10 +161,12 @@ class DBFactory {
                 let indexStore = store.index(option.index)
                 return indexStore.openCursor(keyRange, option.reverse ? (IDBCursor.PREV || "prev") : undefined)
             }
-            // if (keyRange === null && store.getAll) {
-            //     return store.getAll()
-            // }
-            return store.openCursor(keyRange, option.reverse ? (IDBCursor.PREV || "prev") : undefined)
+            if (keyRange === null && store.getAll) {
+                return store.getAll()
+            }
+            else {
+                return store.openCursor(keyRange, option.reverse ? (IDBCursor.PREV || "prev") : undefined)
+            }
         })
     }
     /**
@@ -126,6 +176,18 @@ class DBFactory {
     getTableCount(tableName) {
         return this._requestDBResult(tableName, "readonly", function (store) {
             return store.count()
+        })
+    }
+    getCountByIndex(tableName, index, indexValue) {
+        return this._requestDBResult(tableName, "readonly", function (store) {
+            if (index && store.keyPath !== index) {
+                let indexStore = store.index(index)
+                return indexStore.count(indexValue)
+            }
+            else {
+                return store.count(indexValue || null)
+            }
+
         })
     }
     /**
@@ -158,15 +220,7 @@ class DBFactory {
         })
     }
     _requestDBResult(tableName, writeMode, next) {
-        return new Promise((resolve, reject) => {
-            if (!this.isOpen) {
-                reject({
-                    code: 0,
-                    name: "OpenError",
-                    errMsg: "db is not open"
-                })
-                return
-            }
+        return this._Promise((resolve, reject) => {
             const store = this._getObjectStore(tableName, writeMode)
             const req = next(store)
             req.onsuccess = (e) => {
@@ -210,23 +264,26 @@ class DBFactory {
             return null
         }
     }
+
     _requestDBCursor(tableName, next, mode) {
-        return new Promise((resolve, reject) => {
-            if (!this.isOpen) {
-                reject({
-                    code: 0,
-                    name: "OpenError",
-                    errMsg: "db is not open"
-                })
-                return
-            }
+        return this._Promise((resolve, reject) => {
             let data = []
             const store = this._getObjectStore(tableName, mode || 'readonly')
             const curRequest = next.call(this, store)
+            if (!(curRequest instanceof IDBRequest)) {
+                resolve(curRequest)
+                return
+            }
+
             curRequest.onsuccess = (e) => {
                 let cursor = e.target.result
                 // console.log(cursor)
+                // debugger
                 if (cursor) {
+                    if (!(cursor instanceof IDBCursorWithValue)) {
+                        resolve(cursor)
+                        return
+                    }
                     cursor.continue()
                     data.push(cursor.value)
                     this.log("[getTabData] request onsuccess, tableName: " + tableName + " curKey: " + cursor.key)
@@ -312,6 +369,19 @@ class DBFactory {
                 })
             })
         }
+    }
+    _Promise(fun) {
+        return new Promise((resolve, reject) => {
+            if (!this.isOpen) {
+                reject({
+                    code: 0,
+                    name: "OpenError",
+                    errMsg: "db is not open"
+                })
+                return
+            }
+            fun(resolve, reject)
+        })
     }
     log(str) {
         // console.log("[ " + this.DB_NAME + " ] " + str)

@@ -19,9 +19,13 @@ before("测试前先删除之前测试的数据库", function () {
     console.log("测试前先删除之前测试的数据库")
 })
 
-// after(function () {
-//     // 在这个作用域的所有测试用例运行完之后运行
-// })
+after(function () {
+    // 在这个作用域的所有测试用例运行完之后运行
+    let linkList = document.querySelectorAll(".suite a")
+    linkList.forEach(link => {
+        link.removeAttribute("href")
+    })
+})
 
 // beforeEach(function (...a) {
 //     // 在这个作用域的每一个测试用例运行之前运行
@@ -31,11 +35,11 @@ before("测试前先删除之前测试的数据库", function () {
 // afterEach(function () {
 //     // 在这个作用域的每一个测试用例运行之后运行
 // })
-let testfsdf = null
+
 let test_db = null
 let testData = getTestData()
 let testDataId = null
-describe('DBFactory 测试用例', function () {
+describe('mocha DBFactory 单元测试 用例', function () {
     // this.slow(1)
     describe("基本功能测试", function () {
         it('new DBFactory success', function () {
@@ -61,6 +65,11 @@ describe('DBFactory 测试用例', function () {
                 chai.assert.equal(data.id, testDataId);
             })
         });
+        it('获取表储存数据总数 getTableCount', function () {
+            return test_db.getTableCount("tab1").then(count => {
+                chai.assert.typeOf(count, 'number');
+            })
+        });
         it('更新数据数据 putData', function () {
             let updateData = Object.assign({}, testData)
             updateData.name = "mocha updata user"
@@ -79,22 +88,68 @@ describe('DBFactory 测试用例', function () {
                 chai.assert.typeOf(data, 'undefined');
             })
         });
+        it('清除表所有数据 clearTable', function () {
+            let data = getTestData()
+            let ID = null
+            return test_db.addData("tab1", data).then((id) => {
+                ID = id
+                return test_db.clearTable("tab1")
+            }).then(data => {
+                return test_db.getDataByKey("tab1", ID)
+            }).then(data => {
+                chai.assert.typeOf(data, 'undefined');
+            })
+        });
         it('关闭数据库 close', function () {
             test_db.close()
         });
         it('删除数据库 deleteDatabase', function () {
             return test_db.deleteDatabase(testDbConfig.dbName)
         });
+        describe("", function () {
+            before(function () {
+                if (!test_db) {
+                    console.log("==============")
+                    test_db = new DBFactory(testDbConfig)
+                }
+                if (test_db.isOpen) {
+                    test_db.close()
+                }
+                test_db.deleteDatabase(testDbConfig.dbName)
+                return test_db.open()
+            })
+            let times = 100
+            let dataList = []
+            for (let i = 0; i < times; i++) {
+                let data = getTestData()
+                data.age = i % 20
+                dataList.push(data)
+            }
+            it('保存数据 putDatas', function () {
+                return test_db.putDatas("tab1", dataList).then(res => {
+                    chai.assert.equal(res.data.length, times);
+                })
+            });
+            it('根据索引统计数据 getCountByIndex', function () {
+                return test_db.getCountByIndex("tab1", "age", 10).then(count => {
+                    console.log("getCountByIndex", count)
+                    chai.assert.typeOf(count, 'number');
+                    chai.assert.equal(count, Math.floor(times / 20));
+                })
+            });
+        })
     })
     describe("批量获取数据 getTableData", function () {
         let times = 100
         before(function () {
-            // debugger
-            indexedDB.deleteDatabase(testDbConfig.dbName)
             if (!test_db) {
                 console.log("==============")
                 test_db = new DBFactory(testDbConfig)
             }
+            if (test_db.isOpen) {
+                test_db.close()
+            }
+            test_db.deleteDatabase(testDbConfig.dbName)
             return test_db.open().then(() => {
                 let all = []
                 let data = getTestData()
@@ -110,6 +165,7 @@ describe('DBFactory 测试用例', function () {
         it('获取所有数据', function () {
             let id = testData.id
             return test_db.getTableData("tab1").then((dataList) => {
+                // console.log("dataList", dataList)
                 chai.assert.typeOf(dataList.length, 'number');
                 chai.assert.equal(dataList.length, times);
             })
@@ -285,28 +341,51 @@ describe('DBFactory 测试用例', function () {
         })
     })
 
-    describe("性能对比测试  addData  putData", function () {
+    describe("性能对比测试 putDatas addData  putData", function () {
         before(function () {
-            indexedDB.deleteDatabase(testDbConfig.dbName)
+            if (!test_db) {
+                console.log("==============")
+                test_db = new DBFactory(testDbConfig)
+            }
+            if (test_db.isOpen) {
+                test_db.close()
+            }
+            test_db.deleteDatabase(testDbConfig.dbName)
             return test_db.open()
         })
         let times = 100
-        let testAddData = getTestData()
-        let testPutData = Object.assign({}, testAddData)
+        let dataList = []
+        for (let i = 0; i < times; i++) {
+            dataList.push(getTestData())
+        }
+        it('保存数据 putDatas', function () {
+            return test_db.putDatas("tab1", dataList).then(res => {
+                console.log("putDatas", res)
+            })
+        });
+        it('保存数据 putDatas new', function () {
+            return test_db.putDatas("tab1", dataList, true).then(res => {
+                console.log("putDatas", res)
+            })
+        });
         it('保存数据 addData', function () {
             let all = []
             for (let i = 0; i < times; i++) {
-                all.push(test_db.addData("tab1", testAddData))
+                all.push(test_db.addData("tab1", dataList[i]))
             }
             return Promise.all(all)
         });
+
         it('保存数据 putData', function () {
             let all = []
             for (let i = 0; i < times; i++) {
-                all.push(test_db.putData("tab1", testAddData))
+                all.push(test_db.putData("tab1", dataList[i]))
             }
             return Promise.all(all)
         });
+        after(function () {
+            test_db.close()
+        })
     })
 
 

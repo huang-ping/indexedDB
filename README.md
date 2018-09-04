@@ -12,6 +12,7 @@ indexedDB 封装便于直接使用，indexedDB未加浏览器前缀兼容老版�
 > 如果在最新的浏览器使用，直接引用  src/DBFactory.js，否则需要babel编译，推荐webpack
 
 ### 使用说明
+    可参考 mocha-unit.test
 > #### 1、初始化数据库
 > ```db = new DBFactory(dbConfig)```  
 > ```db.open()```  
@@ -194,11 +195,9 @@ indexedDB 封装便于直接使用，indexedDB未加浏览器前缀兼容老版�
 >})
 > ```
 
-> #### 8、根据id删除 规划中 
+> #### 8、批量更新或增加 规划中
 
 > #### 9、根据索引删除 规划中
-
-> #### 10、批量更新或增加 规划中
 
 
 #### 参与贡献
